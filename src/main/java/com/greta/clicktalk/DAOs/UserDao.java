@@ -1,4 +1,4 @@
-package com.greta.clicktalk.daos;
+package com.greta.clicktalk.DAOs;
 
 import com.greta.clicktalk.entities.User;
 import com.greta.clicktalk.excetions.ResourceNotFoundException;
@@ -38,6 +38,27 @@ public class UserDao {
         return rowsAffected > 0;
     }
 
+    public ResponseEntity<String> updatePassword(String email, String password) {
+
+        if(!existsByEmail(email)) {
+            throw new ResourceNotFoundException("user not found");
+        }
+
+        String sql = "UPDATE users SET password = ? WHERE email = ?";
+        int rowsAffected = jdbcTemplate.update(sql, password, email);
+
+        return rowsAffected > 0 ? ResponseEntity.ok("Password updated successfully") : ResponseEntity.internalServerError().body("Password update failed");
+    }
+
+    public ResponseEntity<String> deleteUserById(long id ) {
+        if(!existsById(id)) {
+             throw new ResourceNotFoundException("user not found");
+        }
+        String sql = "DELETE FROM users WHERE id = ?";
+        int rowsAffected = jdbcTemplate.update(sql, id);
+        return rowsAffected > 0? ResponseEntity.noContent().build() : ResponseEntity.internalServerError().body("Error while deleting user");
+    }
+
     public boolean existsByEmail(String email) {
         String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
         Integer rowsAffected = jdbcTemplate.queryForObject(sql, Integer.class, email);
@@ -48,15 +69,6 @@ public class UserDao {
         String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
         Integer rowsAffected = jdbcTemplate.queryForObject(sql, Integer.class, id);
         return rowsAffected != null && rowsAffected > 0;
-    }
-
-    public ResponseEntity<String> deleteUserById(long id ) {
-        if(!existsById(id)) {
-             throw new ResourceNotFoundException("user not found");
-        }
-        String sql = "DELETE FROM users WHERE id = ?";
-        int rowsAffected = jdbcTemplate.update(sql, id);
-        return rowsAffected > 0? ResponseEntity.noContent().build() : ResponseEntity.internalServerError().body("Error while deleting user");
     }
 
 

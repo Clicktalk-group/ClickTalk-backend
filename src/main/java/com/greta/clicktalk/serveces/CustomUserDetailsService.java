@@ -1,6 +1,6 @@
 package com.greta.clicktalk.serveces;
 
-import com.greta.clicktalk.daos.UserDao;
+import com.greta.clicktalk.DAOs.UserDao;
 import com.greta.clicktalk.entities.CustomUserDetails;
 import com.greta.clicktalk.entities.User;
 import org.springframework.security.core.userdetails.UserDetails;
