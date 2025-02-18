@@ -1,6 +1,8 @@
 package com.greta.clicktalk.daos;
 
 import com.greta.clicktalk.entities.User;
+import com.greta.clicktalk.excetions.ResourceNotFoundException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,6 +42,21 @@ public class UserDao {
         String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
         Integer rowsAffected = jdbcTemplate.queryForObject(sql, Integer.class, email);
         return rowsAffected != null && rowsAffected > 0;
+    }
+
+    private boolean existsById(long id) {
+        String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
+        Integer rowsAffected = jdbcTemplate.queryForObject(sql, Integer.class, id);
+        return rowsAffected != null && rowsAffected > 0;
+    }
+
+    public ResponseEntity<String> deleteUserById(long id ) {
+        if(!existsById(id)) {
+             throw new ResourceNotFoundException("user not found");
+        }
+        String sql = "DELETE FROM users WHERE id = ?";
+        int rowsAffected = jdbcTemplate.update(sql, id);
+        return rowsAffected > 0? ResponseEntity.noContent().build() : ResponseEntity.internalServerError().body("Error while deleting user");
     }
 
 
