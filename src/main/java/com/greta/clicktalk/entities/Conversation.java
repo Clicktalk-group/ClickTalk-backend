@@ -1,11 +1,5 @@
 package com.greta.clicktalk.entities;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
-
-import java.time.Instant;
-
 public class Conversation {
     public Long id;
     public User user;
@@ -26,7 +20,6 @@ public class Conversation {
         this.title = title;
         this.createdAt = createdAt;
     }
-
 
     public Long getId() {
         return id;
@@ -52,11 +45,11 @@ public class Conversation {
         this.title = title;
     }
 
-    public Instant getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 
