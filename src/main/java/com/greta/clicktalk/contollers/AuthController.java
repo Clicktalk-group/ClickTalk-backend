@@ -1,8 +1,10 @@
 package com.greta.clicktalk.contollers;
 
-import com.greta.clicktalk.daos.UserDao;
+import com.greta.clicktalk.DAOs.UserDao;
+import com.greta.clicktalk.DTOs.UpdatePasswordRequestDTO;
 import com.greta.clicktalk.entities.User;
 import com.greta.clicktalk.serveces.JwtUtil;
+import com.greta.clicktalk.serveces.PasswordUpdateService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,12 +19,14 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserDao userDao;
+    private final PasswordUpdateService passwordUpdateService;
     private final PasswordEncoder encoder;
     private final JwtUtil jwtUtils;
 
-    public AuthController(AuthenticationManager authenticationManager, UserDao userDao, PasswordEncoder encoder, JwtUtil jwtUtils) {
+    public AuthController(AuthenticationManager authenticationManager, UserDao userDao, PasswordUpdateService passwordUpdateService, PasswordEncoder encoder, JwtUtil jwtUtils) {
         this.authenticationManager = authenticationManager;
         this.userDao = userDao;
+        this.passwordUpdateService = passwordUpdateService;
         this.encoder = encoder;
         this.jwtUtils = jwtUtils;
     }
@@ -61,6 +65,11 @@ public class AuthController {
         );
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return jwtUtils.generateToken(userDetails.getUsername());
+    }
+
+    @PutMapping("update-password")
+    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordRequestDTO updatePasswordRequestDTO,Authentication authentication) {
+    return passwordUpdateService.updatePassword(updatePasswordRequestDTO, authentication);
     }
 
     @DeleteMapping("delete")
