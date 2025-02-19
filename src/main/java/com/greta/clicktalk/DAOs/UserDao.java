@@ -61,14 +61,14 @@ public class UserDao {
 
     public boolean existsByEmail(String email) {
         String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
-        Integer rowsAffected = jdbcTemplate.queryForObject(sql, Integer.class, email);
-        return rowsAffected != null && rowsAffected > 0;
+        Integer usersNumber = jdbcTemplate.queryForObject(sql, Integer.class, email);
+        return usersNumber != null && usersNumber > 0;
     }
 
     private boolean existsById(long id) {
         String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
-        Integer rowsAffected = jdbcTemplate.queryForObject(sql, Integer.class, id);
-        return rowsAffected != null && rowsAffected > 0;
+        Integer usersNumber = jdbcTemplate.queryForObject(sql, Integer.class, id);
+        return usersNumber != null && usersNumber > 0;
     }
 
 
