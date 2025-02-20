@@ -1,22 +1,22 @@
 package com.greta.clicktalk.entities;
 
 public class Conversation {
-    public Long id;
-    public User user;
+    public long id;
+    public long userId;
     public String title;
     public String createdAt;
 
     public Conversation() {
     }
 
-    public Conversation(User user, String title) {
-        this.user = user;
+    public Conversation(long userId, String title) {
+        this.userId = userId;
         this.title = title;
     }
 
-    public Conversation(Long id, User user, String title, String createdAt) {
+    public Conversation(long id, long userId, String title, String createdAt) {
         this.id = id;
-        this.user = user;
+        this.userId = userId;
         this.title = title;
         this.createdAt = createdAt;
     }
@@ -29,12 +29,12 @@ public class Conversation {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     public String getTitle() {
