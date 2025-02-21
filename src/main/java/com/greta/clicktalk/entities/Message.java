@@ -2,11 +2,11 @@ package com.greta.clicktalk.entities;
 
 
 public class Message {
-    public long id;
-    public long convId;
-    public String content;
-    public Boolean isBot;
-    public String createdAt;
+    private long id;
+    private long convId;
+    private String content;
+    private Boolean isBot;
+    private String createdAt;
 
     public Message() {
     }

@@ -5,10 +5,10 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 public class Project {
-    public long id;
-    public long userId;
-    public String title;
-    public String context;
+    private long id;
+    private long userId;
+    private String title;
+    private String context;
 
     public Project() {
     }

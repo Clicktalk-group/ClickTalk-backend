@@ -2,37 +2,36 @@ package com.greta.clicktalk.entities;
 
 
 public class Setting {
-
-    public Long id;
-    public User userId;
-    public String theme;
+    private long id;
+    private long userId;
+    private String theme;
 
     public Setting() {}
 
-    public Setting(User userId, String theme) {
+    public Setting(long userId, String theme) {
         this.userId = userId;
         this.theme = theme;
     }
 
-    public Setting(Long id, User userId, String theme) {
+    public Setting(long id, long userId, String theme) {
         this.id = id;
         this.userId = userId;
         this.theme = theme;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public User getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(User userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 

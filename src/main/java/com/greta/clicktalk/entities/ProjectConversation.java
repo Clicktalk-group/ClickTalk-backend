@@ -1,8 +1,8 @@
 package com.greta.clicktalk.entities;
 
 public class ProjectConversation {
-    public long projectId;
-    public long convId;
+    private long projectId;
+    private long convId;
 
     public ProjectConversation() {
     }

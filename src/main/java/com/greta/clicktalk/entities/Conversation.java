@@ -1,10 +1,10 @@
 package com.greta.clicktalk.entities;
 
 public class Conversation {
-    public long id;
-    public long userId;
-    public String title;
-    public String createdAt;
+    private long id;
+    private long userId;
+    private String title;
+    private String createdAt;
 
     public Conversation() {
     }
