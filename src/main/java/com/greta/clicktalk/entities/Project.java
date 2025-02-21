@@ -6,19 +6,22 @@ import org.springframework.data.relational.core.mapping.Table;
 
 public class Project {
     public long id;
+    public long userId;
     public String title;
     public String context;
 
     public Project() {
     }
 
-    public Project(String title, String context) {
+    public Project(long userId, String title, String context) {
+        this.userId = userId;
         this.title = title;
         this.context = context;
     }
 
-    public Project(long id, String title, String context) {
+    public Project(long id,long userId, String title, String context) {
         this.id = id;
+        this.userId = userId;
         this.title = title;
         this.context = context;
     }
@@ -29,6 +32,14 @@ public class Project {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     public String getTitle() {

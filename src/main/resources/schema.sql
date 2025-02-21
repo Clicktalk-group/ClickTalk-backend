@@ -20,8 +20,10 @@ CREATE TABLE IF NOT EXISTS conversations (
 
 CREATE TABLE IF NOT EXISTS projects(
         id BIGINT AUTO_INCREMENT PRIMARY KEY,
+        user_id BIGINT,
         title VARCHAR(255) NOT NULL ,
-        context LONGTEXT NOT NULL
+        context LONGTEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS project_conversation(
