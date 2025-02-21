@@ -28,7 +28,8 @@ public class ConversationDao {
     );
 
     public ResponseEntity<List<Conversation>> getAllConversationsByUserId(long userId) {
-        String sql = "SELECT * FROM conversations WHERE user_id=?";
+        String sql = "SELECT * FROM conversations AS c WHERE user_id=? AND c.id NOT IN (SELECT conv_id FROM project_conversation)";
+
         List<Conversation> conversations = jdbcTemplate.query(sql, conversationRowMapper, userId);
         return conversations.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(conversations);
     }
@@ -68,18 +69,12 @@ public class ConversationDao {
         if (!existsById(conversationId)) {
             throw new ResourceNotFoundException("Conversation with id " + conversationId + " not found");
         }
-try {
     String sql = "DELETE FROM conversations WHERE id=? AND user_id = ?";
     int rowAffected = jdbcTemplate.update(sql, conversationId, userId);
 
     // reset the auto_increment for conversations table
     jdbcTemplate.update("ALTER TABLE conversations AUTO_INCREMENT = 0;");
     return rowAffected > 0 ? ResponseEntity.noContent().build() : ResponseEntity.internalServerError().body("Error: something went wrong while deleting a conversation");
-}
-catch (Exception e) {
-    System.out.println(e.getMessage());
-}
-return ResponseEntity.noContent().build();
     }
 
     public boolean existsById(long conversationId) {
