@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS conversations (
         user_id bigint NOT NULL,
         title VARCHAR(255) NOT NULL,
         created_at TIMESTAMP DEFAULT NOW(),
-        FOREIGN KEY (user_id) REFERENCES users(id)
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS messages (
@@ -24,13 +24,13 @@ CREATE TABLE IF NOT EXISTS messages (
         content LONGTEXT NOT NULL,
         is_bot BOOLEAN NOT NULL,
         created_at TIMESTAMP DEFAULT NOW(),
-        FOREIGN KEY (conv_id) REFERENCES conversations(id)
+        FOREIGN KEY (conv_id) REFERENCES conversations(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS settings (
         id BIGINT AUTO_INCREMENT PRIMARY KEY,
         user_id BIGINT NOT NULL,
         theme VARCHAR(255) NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id)
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
