@@ -38,7 +38,8 @@ public class ConversationDao {
             throw new ResourceNotFoundException("Conversation with id " + conversationId + " not found");
         }
         String sql = "SELECT * FROM conversations WHERE id=? AND user_id=?  ";
-        Conversation conversation = jdbcTemplate.queryForObject(sql, conversationRowMapper, userId);
+
+        Conversation conversation = jdbcTemplate.queryForObject(sql, conversationRowMapper,conversationId, userId);
         return conversation == null ? ResponseEntity.internalServerError().body("something went wrong") : ResponseEntity.ok(conversation);
     }
 
@@ -67,15 +68,21 @@ public class ConversationDao {
         if (!existsById(conversationId)) {
             throw new ResourceNotFoundException("Conversation with id " + conversationId + " not found");
         }
-        String sql = "DELETE FROM conversations WHERE id=? AND user_id = ?";
-        int rowAffected=  jdbcTemplate.update(sql, conversationId, userId);
+try {
+    String sql = "DELETE FROM conversations WHERE id=? AND user_id = ?";
+    int rowAffected = jdbcTemplate.update(sql, conversationId, userId);
 
-        // reset the auto_increment for conversations table
-        jdbcTemplate.update("ALTER TABLE conversations AUTO_INCREMENT = 0;");
-        return rowAffected > 0 ?ResponseEntity.noContent().build() : ResponseEntity.internalServerError().body("Error: something went wrong while deleting a conversation");
+    // reset the auto_increment for conversations table
+    jdbcTemplate.update("ALTER TABLE conversations AUTO_INCREMENT = 0;");
+    return rowAffected > 0 ? ResponseEntity.noContent().build() : ResponseEntity.internalServerError().body("Error: something went wrong while deleting a conversation");
+}
+catch (Exception e) {
+    System.out.println(e.getMessage());
+}
+return ResponseEntity.noContent().build();
     }
 
-    private boolean existsById(long conversationId) {
+    public boolean existsById(long conversationId) {
          String sql = "SELECT COUNT(*) FROM conversations WHERE id=?";
         Integer conversationsNumber = jdbcTemplate.queryForObject(sql, Integer.class, conversationId);
         return conversationsNumber != null && conversationsNumber > 0;

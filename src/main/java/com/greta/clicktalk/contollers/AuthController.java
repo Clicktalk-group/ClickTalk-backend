@@ -57,14 +57,14 @@ public class AuthController {
 
     @PostMapping("/login")
     public String authenticateUser( @RequestBody User user) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        user.getEmail(),
-                        user.getPassword()
-                )
-        );
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return jwtUtils.generateToken(userDetails.getUsername());
+       Authentication authentication = authenticationManager.authenticate(
+               new UsernamePasswordAuthenticationToken(
+                       user.getEmail(),
+                       user.getPassword()
+               )
+       );
+       UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+       return jwtUtils.generateToken(userDetails.getUsername());
     }
 
     @PutMapping("update-password")

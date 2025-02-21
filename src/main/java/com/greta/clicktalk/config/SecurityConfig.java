@@ -46,6 +46,7 @@ public class SecurityConfig {
                 authorizeRequests.requestMatchers("/auth/register","/auth/login").permitAll()
                         .requestMatchers("/auth/delete","auth/update-password").hasRole("USER")
                         .requestMatchers("/conversation/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/messages/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
             );
