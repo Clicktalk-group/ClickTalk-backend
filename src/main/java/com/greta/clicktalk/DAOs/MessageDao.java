@@ -2,6 +2,7 @@ package com.greta.clicktalk.DAOs;
 
 import com.greta.clicktalk.entities.Message;
 import com.greta.clicktalk.excetions.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -27,23 +28,35 @@ public class MessageDao {
             rs.getString("created_at")
     );
 
-    public ResponseEntity<List<Message>> getConversationMessages(long conversationId) {
-        String query = "SELECT * FROM messages WHERE conv_id=?";
+    public ResponseEntity<List<Message>> getConversationMessages(long conversationId,long userId) {
+        String checkQuery = "SELECT user_id FROM conversations WHERE id = ?";
+        Long ownerId = jdbcTemplate.queryForObject(checkQuery, Long.class, conversationId);
 
+        if (ownerId == null) {
+            return ResponseEntity.notFound().build(); // Conversation does not exist
+        }
+
+        if(!ownerId.equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        String query = "SELECT * FROM messages WHERE conv_id=?";
         List<Message> messages = jdbcTemplate.query(query, messageRowMapper, conversationId);
         return messages.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(messages);
     }
 
-    public ResponseEntity<String> addMessage(Message message) {
-        if(!conversationDao.existsById(message.getConvId())){
-            throw new ResourceNotFoundException("Conversation with id "+message.getConvId()+" does not exist");
+    public ResponseEntity<?> addMessage(long conversationId, String content, boolean isBot) {
+        if(!conversationDao.existsById(conversationId)){
+            throw new ResourceNotFoundException("Conversation with id "+conversationId+" does not exist");
         }
+
         String sql = "INSERT INTO messages (conv_id,content,is_bot) VALUES (?,?,?);";
-        try{
-            jdbcTemplate.update(sql,message.getConvId(),message.getContent(),message.getIsBot());
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-        return ResponseEntity.ok("Message added");
+           int rowAffected = jdbcTemplate.update(sql,conversationId,content,isBot);
+           if(rowAffected == 1){
+            String query = "SELECT * FROM messages ORDER BY created_at DESC LIMIT 1;";
+            Message message = jdbcTemplate.queryForObject(query, messageRowMapper);
+            return ResponseEntity.ok(message);
+           }
+           return ResponseEntity.internalServerError().body("something went wrong while adding message");
     }
 }

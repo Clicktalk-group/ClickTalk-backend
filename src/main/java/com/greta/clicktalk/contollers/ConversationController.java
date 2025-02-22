@@ -36,14 +36,6 @@ public class ConversationController {
       return  conversationDao.getConversationById(id, currentUser.getId());
     }
 
-    @PostMapping("create")
-    public ResponseEntity<Conversation> createConversation(Authentication authentication, @RequestBody Conversation conversation) {
-        String username = authentication.getName();
-        User currentUser = userDao.findByEmail(username);
-        conversation.setUserId(currentUser.getId());
-      return  conversationDao.addConversation(conversation);
-    }
-
     @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deleteConversation(Authentication authentication,@PathVariable long id) {
         String email = authentication.getName();

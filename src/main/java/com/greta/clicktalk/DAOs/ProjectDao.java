@@ -36,6 +36,11 @@ public class ProjectDao {
         return projects.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(projects);
     }
 
+    public String getProjectContext(Long projectId) {
+        String sql = "SELECT context FROM projects where id = ?";
+         return jdbcTemplate.queryForObject(sql, String.class, projectId);
+    }
+
     public ResponseEntity<Project> addNewProject(Project project) {
         String sql = "INSERT INTO projects (user_id,title, context) VALUES (?, ?, ?)";
 

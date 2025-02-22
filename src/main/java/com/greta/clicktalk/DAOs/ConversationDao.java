@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ConversationDao {
@@ -44,7 +45,12 @@ public class ConversationDao {
         return conversation == null ? ResponseEntity.internalServerError().body("something went wrong") : ResponseEntity.ok(conversation);
     }
 
-    public ResponseEntity<Conversation> addConversation(Conversation conversation) {
+    public List<Map<String, Object>> getMessages(Long conversationId) {
+        String sql = "SELECT content, is_bot FROM messages WHERE conv_id = ? ORDER BY created_at ASC ";
+        return jdbcTemplate.queryForList(sql, conversationId);
+    }
+
+    public Conversation addConversation(Conversation conversation) {
         String sql = "INSERT INTO conversations (user_id, title,created_at) VALUES (?, ?, ?)";
         String now = LocalDateTime.now().toString();
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -62,7 +68,7 @@ public class ConversationDao {
             conversation.setId(keyHolder.getKey().longValue());
         }
 
-        return ResponseEntity.ok(conversation);
+        return conversation;
     }
 
     public ResponseEntity<String> deleteConversation(long conversationId,long userId) {
@@ -76,6 +82,8 @@ public class ConversationDao {
     jdbcTemplate.update("ALTER TABLE conversations AUTO_INCREMENT = 0;");
     return rowAffected > 0 ? ResponseEntity.noContent().build() : ResponseEntity.internalServerError().body("Error: something went wrong while deleting a conversation");
     }
+
+
 
     public boolean existsById(long conversationId) {
          String sql = "SELECT COUNT(*) FROM conversations WHERE id=?";

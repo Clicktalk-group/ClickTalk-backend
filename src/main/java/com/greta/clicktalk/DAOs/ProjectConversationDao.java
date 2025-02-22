@@ -19,7 +19,7 @@ public class ProjectConversationDao {
             rs.getLong("conv_id")
     );
 
-    public void add(long projectId, long conversationId) {
+    public void add(Long projectId, Long conversationId) {
         if(exist(conversationId)) {
             throw new ConversationAlreadyAssignedException("Conversation ID " + conversationId + " is already linked to a project.");
         }
