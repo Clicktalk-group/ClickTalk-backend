@@ -69,7 +69,31 @@ public class DeepSeekService {
         return extractMessage(response.getBody());
     }
 
-    public String extractMessage(String responseBody) {
+    public String generateTitleFromMessage(String message) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + API_KEY);
+
+        List<Map<String, String>> messages = new ArrayList<>();
+
+        messages.add(Map.of("role", "system", "content","Generate a short and catchy title for a conversation based on the following first user message. Keep it under 8 words and make it relevant and engaging without double quotes." ));
+        messages.add(Map.of("role", "user", "content", message));
+
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("model", "deepseek-chat");
+        requestBody.put("messages", messages);
+        requestBody.put("max_tokens", 20);
+
+
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(API_URL, requestEntity, String.class);
+        return extractMessage(response.getBody());
+    }
+
+
+    private String extractMessage(String responseBody) {
         try {
             JsonNode jsonNode = objectMapper.readTree(responseBody);
             return jsonNode.path("choices").get(0).path("message").path("content").asText();

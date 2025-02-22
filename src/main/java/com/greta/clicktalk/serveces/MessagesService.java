@@ -32,11 +32,11 @@ public class MessagesService {
 
         // get the current user id
         long userId = getUserIdFromAuth(auth);
-        String title = "new chat";
         Long projectId =  sendMessageRequestDTO.getProjectId();
         Long conversationId =  sendMessageRequestDTO.getConversationId();
 
         if(conversationId == null){
+            String title = deepSeekService.generateTitleFromMessage(sendMessageRequestDTO.getMessage());
             Conversation conversation = new Conversation(
                     userId,
                     title
