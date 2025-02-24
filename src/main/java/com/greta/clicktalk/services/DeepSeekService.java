@@ -1,4 +1,4 @@
-package com.greta.clicktalk.serveces;
+package com.greta.clicktalk.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

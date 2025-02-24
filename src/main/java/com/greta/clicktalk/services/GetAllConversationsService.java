@@ -1,10 +1,7 @@
-package com.greta.clicktalk.serveces;
+package com.greta.clicktalk.services;
 
 import com.greta.clicktalk.DAOs.ConversationDao;
-import com.greta.clicktalk.entities.Conversation;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class GetAllConversationsService {

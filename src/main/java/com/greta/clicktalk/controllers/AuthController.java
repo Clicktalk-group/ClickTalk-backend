@@ -1,10 +1,10 @@
-package com.greta.clicktalk.contollers;
+package com.greta.clicktalk.controllers;
 
 import com.greta.clicktalk.DAOs.UserDao;
 import com.greta.clicktalk.DTOs.UpdatePasswordRequestDTO;
 import com.greta.clicktalk.entities.User;
-import com.greta.clicktalk.serveces.JwtUtil;
-import com.greta.clicktalk.serveces.PasswordUpdateService;
+import com.greta.clicktalk.services.JwtUtil;
+import com.greta.clicktalk.services.PasswordUpdateService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -1,4 +1,4 @@
-package com.greta.clicktalk.serveces;
+package com.greta.clicktalk.services;
 
 import com.greta.clicktalk.DAOs.UserDao;
 import com.greta.clicktalk.DTOs.UpdatePasswordRequestDTO;

@@ -1,10 +1,9 @@
-package com.greta.clicktalk.contollers;
+package com.greta.clicktalk.controllers;
 
 import com.greta.clicktalk.DAOs.ProjectDao;
 import com.greta.clicktalk.DAOs.UserDao;
 import com.greta.clicktalk.entities.Project;
 import com.greta.clicktalk.entities.User;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;

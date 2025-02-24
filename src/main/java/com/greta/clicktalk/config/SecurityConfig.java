@@ -1,6 +1,6 @@
 package com.greta.clicktalk.config;
 
-import com.greta.clicktalk.serveces.CustomUserDetailsService;
+import com.greta.clicktalk.services.CustomUserDetailsService;
 import com.greta.clicktalk.security.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

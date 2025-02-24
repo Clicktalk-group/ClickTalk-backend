@@ -1,4 +1,4 @@
-package com.greta.clicktalk.contollers;
+package com.greta.clicktalk.controllers;
 
 import com.greta.clicktalk.DAOs.ConversationDao;
 import com.greta.clicktalk.DAOs.UserDao;

@@ -1,4 +1,4 @@
-package com.greta.clicktalk.serveces;
+package com.greta.clicktalk.services;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

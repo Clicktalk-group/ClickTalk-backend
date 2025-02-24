@@ -1,16 +1,10 @@
-package com.greta.clicktalk.contollers;
+package com.greta.clicktalk.controllers;
 
-import com.greta.clicktalk.DAOs.MessageDao;
 import com.greta.clicktalk.DTOs.SendMessageRequestDTO;
-import com.greta.clicktalk.entities.Message;
-import com.greta.clicktalk.serveces.MessagesService;
-import org.springframework.http.HttpStatus;
+import com.greta.clicktalk.services.MessagesService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("messages")
