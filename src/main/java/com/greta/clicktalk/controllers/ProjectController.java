@@ -2,6 +2,7 @@ package com.greta.clicktalk.controllers;
 
 import com.greta.clicktalk.DAOs.ProjectDao;
 import com.greta.clicktalk.DAOs.UserDao;
+import com.greta.clicktalk.DTOs.ProjectResponseDTO;
 import com.greta.clicktalk.entities.Project;
 import com.greta.clicktalk.entities.User;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class ProjectController {
     }
 
     @GetMapping("all")
-    public ResponseEntity<List<Project>> getAllProjects(Authentication auth) {
+    public ResponseEntity<List<ProjectResponseDTO>> getAllProjects(Authentication auth) {
         long userId = getUserIdFromAuthentication(auth);
         return projectDao.getAllProjectsByUserId(userId);
     }

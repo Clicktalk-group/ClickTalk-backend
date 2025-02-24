@@ -52,9 +52,7 @@ public class MessagesService {
         messageDao.addMessage(conversationId,sendMessageRequestDTO.getMessage(),false);
 
         String response = deepSeekService.callDeepSeekAPI(conversationId,projectId);
-        return ResponseEntity.ok(messageDao.addMessage(conversationId,response,true)
-);
-
+        return messageDao.addMessage(conversationId,response,true);
     }
 
     public ResponseEntity<?> getConversationMessages(Long conversationId, Authentication auth) {

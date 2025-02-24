@@ -36,6 +36,15 @@ public class ConversationController {
       return  conversationDao.getConversationById(id, currentUser.getId());
     }
 
+    @GetMapping("project/{project-id}")
+    public ResponseEntity<?> getConversationByProjectId(Authentication authentication, @PathVariable("project-id") long projectId) {
+        String username = authentication.getName();
+        User currentUser = userDao.findByEmail(username);
+        long userId = currentUser.getId();
+        List<Conversation> conversations =conversationDao.getConversationsByProjectId(projectId,userId);
+        return ResponseEntity.ok(conversations);
+    }
+
     @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deleteConversation(Authentication authentication,@PathVariable long id) {
         String email = authentication.getName();

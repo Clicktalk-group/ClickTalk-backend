@@ -45,6 +45,12 @@ public class ConversationDao {
         return conversation == null ? ResponseEntity.internalServerError().body("something went wrong") : ResponseEntity.ok(conversation);
     }
 
+    public List<Conversation> getConversationsByProjectId(long projectId,long userId) {
+        String sql = "SELECT * FROM conversations AS c WHERE c.user_id = ? AND c.id IN (SELECT conv_id FROM project_conversation WHERE project_id=?)";
+
+        return jdbcTemplate.query(sql, conversationRowMapper,userId,projectId) ;
+    }
+
     public List<Map<String, Object>> getMessages(Long conversationId) {
         String sql = "SELECT content, is_bot FROM messages WHERE conv_id = ? ORDER BY created_at ASC ";
         return jdbcTemplate.queryForList(sql, conversationId);

@@ -1,5 +1,7 @@
 package com.greta.clicktalk.DAOs;
 
+import com.greta.clicktalk.DTOs.ProjectResponseDTO;
+import com.greta.clicktalk.entities.Conversation;
 import com.greta.clicktalk.entities.Project;
 import com.greta.clicktalk.excetions.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -10,14 +12,17 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public class ProjectDao {
     private final JdbcTemplate jdbcTemplate;
+    private final ConversationDao conversationDao;
 
-    public ProjectDao(JdbcTemplate jdbcTemplate) {
+    public ProjectDao(JdbcTemplate jdbcTemplate, ConversationDao conversationDao) {
         this.jdbcTemplate = jdbcTemplate;
+        this.conversationDao = conversationDao;
     }
 
     private final RowMapper<Project> projectRowMapper = (rs, rowNum) ->
@@ -28,12 +33,25 @@ public class ProjectDao {
                     rs.getString("context")
             );
 
-    public ResponseEntity<List<Project>> getAllProjectsByUserId(long userId) {
+    public ResponseEntity<List<ProjectResponseDTO>> getAllProjectsByUserId(long userId) {
         String sql = "SELECT * FROM projects where user_id = ?";
 
         List<Project> projects  = jdbcTemplate.query(sql, projectRowMapper, userId);
 
-        return projects.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(projects);
+        List<ProjectResponseDTO> responseDTOS = new ArrayList<>();
+
+        for (Project project : projects) {
+            List<Conversation> conversations = conversationDao.getConversationsByProjectId(project.getId(),userId);
+            System.out.println(conversations.size());
+            responseDTOS.add(new ProjectResponseDTO(
+                    project.getId(),
+                    project.getTitle(),
+                    project.getContext(),
+                    conversations
+            ));
+        }
+
+        return projects.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(responseDTOS);
     }
 
     public String getProjectContext(Long projectId) {
