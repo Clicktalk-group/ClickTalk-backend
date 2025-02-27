@@ -1,5 +1,6 @@
 package com.greta.clicktalk.controllers;
 
+import com.greta.clicktalk.DAOs.SettingDao;
 import com.greta.clicktalk.DAOs.UserDao;
 import com.greta.clicktalk.DTOs.UpdatePasswordRequestDTO;
 import com.greta.clicktalk.entities.User;
@@ -19,13 +20,15 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserDao userDao;
+    private final SettingDao settingDao;
     private final PasswordUpdateService passwordUpdateService;
     private final PasswordEncoder encoder;
     private final JwtUtil jwtUtils;
 
-    public AuthController(AuthenticationManager authenticationManager, UserDao userDao, PasswordUpdateService passwordUpdateService, PasswordEncoder encoder, JwtUtil jwtUtils) {
+    public AuthController(AuthenticationManager authenticationManager, UserDao userDao, SettingDao settingDao, PasswordUpdateService passwordUpdateService, PasswordEncoder encoder, JwtUtil jwtUtils) {
         this.authenticationManager = authenticationManager;
         this.userDao = userDao;
+        this.settingDao = settingDao;
         this.passwordUpdateService = passwordUpdateService;
         this.encoder = encoder;
         this.jwtUtils = jwtUtils;
@@ -38,16 +41,18 @@ public class AuthController {
         if (alreadyExists) {
             return ResponseEntity.badRequest().body("Error: Email is already in use!");
         }
-
-    User newUser = new User(
+        User newUser = new User(
             user.getEmail(),
             encoder.encode(user.getPassword()),
             "USER"
-    );
+        );
 
-        boolean isUserExists = userDao.save(newUser);
+        newUser = userDao.save(newUser);
 
-        if(isUserExists) {
+        if(newUser != null) {
+            // add the initial setting
+            settingDao.addSetting("dark",newUser.getId());
+
             String jwtToken = jwtUtils.generateToken(newUser.getEmail());
             return ResponseEntity.ok("User registered successfully! your Token: " + jwtToken);
         }
@@ -67,12 +72,12 @@ public class AuthController {
        return jwtUtils.generateToken(userDetails.getUsername());
     }
 
-    @PutMapping("update-password")
+    @PutMapping("/update-password")
     public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordRequestDTO updatePasswordRequestDTO,Authentication authentication) {
     return passwordUpdateService.updatePassword(updatePasswordRequestDTO, authentication);
     }
 
-    @DeleteMapping("delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<String> deleteUser(Authentication authentication) {
      User currentUser = userDao.findByEmail(authentication.getName());
      return userDao.deleteUserById(currentUser.getId());

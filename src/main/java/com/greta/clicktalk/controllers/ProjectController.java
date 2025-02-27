@@ -24,33 +24,27 @@ public class ProjectController {
 
     @GetMapping("all")
     public ResponseEntity<List<ProjectResponseDTO>> getAllProjects(Authentication auth) {
-        long userId = getUserIdFromAuthentication(auth);
+        long userId = userDao.getUserIdFromAuth(auth);
         return projectDao.getAllProjectsByUserId(userId);
     }
 
     @PostMapping("/add")
     public ResponseEntity<Project> addProject(@RequestBody Project project, Authentication auth) {
-        long userId = getUserIdFromAuthentication(auth);
+        long userId = userDao.getUserIdFromAuth(auth);
         project.setUserId(userId);
         return projectDao.addNewProject(project);
     }
 
     @PutMapping("update")
     public ResponseEntity<?> updateProject(@RequestBody Project project, Authentication auth) {
-        long userId = getUserIdFromAuthentication(auth);
+        long userId = userDao.getUserIdFromAuth(auth);
         project.setUserId(userId);
         return projectDao.updateProject(project);
     }
 
     @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deleteProject(@PathVariable long id, Authentication auth) {
-        long userId = getUserIdFromAuthentication(auth);
+        long userId = userDao.getUserIdFromAuth(auth);
         return projectDao.deleteProject(id, userId);
-    }
-
-    private long getUserIdFromAuthentication(Authentication auth) {
-        String email = auth.getName();
-        User currentUser = userDao.findByEmail(email);
-        return currentUser.getId();
     }
 }

@@ -22,33 +22,29 @@ public class ConversationController {
     }
 
     @GetMapping("all")
-    public ResponseEntity<List<Conversation>> getAllConversations(Authentication authentication) {
-        String username = authentication.getName();
-        User currentUser = userDao.findByEmail(username);
-        return conversationDao.getAllConversationsByUserId(currentUser.getId());
+    public ResponseEntity<List<Conversation>> getAllConversations(Authentication auth) {
+        long userId = userDao.getUserIdFromAuth(auth);
+        return conversationDao.getAllConversationsByUserId(userId);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getConversationById(Authentication authentication, @PathVariable long id) {
-        String username = authentication.getName();
-        User currentUser = userDao.findByEmail(username);
-
-      return  conversationDao.getConversationById(id, currentUser.getId());
+    public ResponseEntity<?> getConversationById(Authentication auth, @PathVariable long id) {
+       long userId = userDao.getUserIdFromAuth(auth);
+       return  conversationDao.getConversationById(id,userId);
     }
 
     @GetMapping("project/{project-id}")
-    public ResponseEntity<?> getConversationByProjectId(Authentication authentication, @PathVariable("project-id") long projectId) {
-        String username = authentication.getName();
-        User currentUser = userDao.findByEmail(username);
-        long userId = currentUser.getId();
+    public ResponseEntity<?> getConversationByProjectId(Authentication auth, @PathVariable("project-id") long projectId) {
+        long userId = userDao.getUserIdFromAuth(auth);
+
         List<Conversation> conversations =conversationDao.getConversationsByProjectId(projectId,userId);
         return ResponseEntity.ok(conversations);
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<String> deleteConversation(Authentication authentication,@PathVariable long id) {
-        String email = authentication.getName();
-        User currentUser = userDao.findByEmail(email);
-        return  conversationDao.deleteConversation(id, currentUser.getId());
+    public ResponseEntity<String> deleteConversation(Authentication auth,@PathVariable long id) {
+        long userId = userDao.getUserIdFromAuth(auth);
+
+        return  conversationDao.deleteConversation(id,userId);
     }
 }

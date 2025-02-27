@@ -2,6 +2,7 @@ package com.greta.clicktalk.DAOs;
 
 import com.greta.clicktalk.entities.ProjectConversation;
 import com.greta.clicktalk.excetions.ConversationAlreadyAssignedException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -23,9 +24,12 @@ public class ProjectConversationDao {
         if(exist(conversationId)) {
             throw new ConversationAlreadyAssignedException("Conversation ID " + conversationId + " is already linked to a project.");
         }
-
-        String sql = "INSERT INTO project_conversation (project_id, conv_id) VALUES (?, ?) ";
-        jdbcTemplate.update(sql, projectId, conversationId);
+        try {
+            String sql = "INSERT INTO project_conversation (project_id, conv_id) VALUES (?, ?) ";
+            jdbcTemplate.update(sql, projectId, conversationId);
+        }catch (DataIntegrityViolationException e) {
+            throw new DataIntegrityViolationException("Error: something went wrong while adding a conversation.");
+        }
     }
 
     private boolean exist(long conversation_id) {

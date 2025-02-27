@@ -42,7 +42,6 @@ public class ProjectDao {
 
         for (Project project : projects) {
             List<Conversation> conversations = conversationDao.getConversationsByProjectId(project.getId(),userId);
-            System.out.println(conversations.size());
             responseDTOS.add(new ProjectResponseDTO(
                     project.getId(),
                     project.getTitle(),
