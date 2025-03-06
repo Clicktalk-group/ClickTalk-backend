@@ -33,8 +33,6 @@ public class MessagesService {
 
         // get the current user id
         long userId = userDao.getUserIdFromAuth(auth);
-        Long projectId =  sendMessageRequestDTO.getProjectId();
-        Long conversationId =  sendMessageRequestDTO.getConversationId();
 
         // get the project id and conversation id from the request
         Long projectId = sendMessageRequestDTO.getProjectId();

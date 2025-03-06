@@ -47,8 +47,11 @@ public class ConversationController {
             @ApiResponse(responseCode = "404", description = "Conversation not found", content = @Content(examples = @ExampleObject(name = "Conversation not found", value = "{\"error\":\"Conversation with id 1 not found\"}")))
     })
  public ResponseEntity<?> getConversationById(Authentication auth, @PathVariable long id) {
-       long userId = userDao.getUserIdFromAuth(auth);
-       return  conversationDao.getConversationById(id,userId);
+        long userId = userDao.getUserIdFromAuth(auth);
+        return conversationDao.getConversationById(id, userId);
+    };
+
+    @GetMapping("project/{project-id}")
     @Operation(summary = "Get conversations by project ID", description = "Retrieve all conversations for a specific project for the authenticated user.", responses = {
             @ApiResponse(responseCode = "200", description = "Conversations retrieved successfully", content = @Content(examples = @ExampleObject(name = "Example response", value = "[{\"id\":1,\"userId\":1,\"title\":\"Conversation 1\",\"createdAt\":\"2025-03-04T10:00:00\"}]"))),
             @ApiResponse(responseCode = "204", description = "No conversations found", content = @Content(examples = @ExampleObject(name = "No conversations found", value = "[]")))
