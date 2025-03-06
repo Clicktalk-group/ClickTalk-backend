@@ -45,8 +45,8 @@ public class SecurityConfig {
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(authorizeRequests ->
-                authorizeRequests.requestMatchers("/auth/register","/auth/login").permitAll()
-                        .requestMatchers("/auth/delete","auth/update-password").hasRole("USER")
+                authorizeRequests.requestMatchers("/auth/register","/auth/login","/swagger-ui/**","/v3/api-docs/**").permitAll()
+                        .requestMatchers("/auth/delete","/auth/update-password").hasRole("USER")
                         .requestMatchers("/conversation/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/messages/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
