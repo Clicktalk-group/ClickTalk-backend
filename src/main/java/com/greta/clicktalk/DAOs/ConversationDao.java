@@ -52,7 +52,7 @@ public class ConversationDao {
     }
 
     public List<Map<String, Object>> getMessages(Long conversationId) {
-        String sql = "SELECT content, is_bot FROM messages WHERE conv_id = ? ORDER BY created_at ASC ";
+        String sql = "SELECT content, is_bot FROM messages WHERE conv_id = ? ORDER BY created_at ";
         return jdbcTemplate.queryForList(sql, conversationId);
     }
 
@@ -92,7 +92,7 @@ public class ConversationDao {
 
 
     public boolean existsById(long conversationId) {
-         String sql = "SELECT COUNT(*) FROM conversations WHERE id=?";
+        String sql = "SELECT COUNT(*) FROM conversations WHERE id=?";
         Integer conversationsNumber = jdbcTemplate.queryForObject(sql, Integer.class, conversationId);
         return conversationsNumber != null && conversationsNumber > 0;
     }

@@ -29,15 +29,17 @@ public class MessageDao {
     );
 
     public ResponseEntity<List<Message>> getConversationMessages(long conversationId,long userId) {
-        String checkQuery = "SELECT user_id FROM conversations WHERE id = ?";
-        Long ownerId = jdbcTemplate.queryForObject(checkQuery, Long.class, conversationId);
 
-        if (ownerId == null) {
-            return ResponseEntity.notFound().build(); // Conversation does not exist
-        }
+        // check if the conversation exist and get his ownerId
+        if(conversationDao.existsById(conversationId)){
+            String checkQuery = "SELECT user_id FROM conversations WHERE id = ?";
 
-        if(!ownerId.equals(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            Long ownerId = jdbcTemplate.queryForObject(checkQuery, Long.class, conversationId);
+            if(ownerId != null && !ownerId.equals(userId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        }else{
+            throw new ResourceNotFoundException("conversation with ID: " + conversationId + " dose not exist");
         }
 
         String query = "SELECT * FROM messages WHERE conv_id=?";

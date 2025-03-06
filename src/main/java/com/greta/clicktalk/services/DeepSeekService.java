@@ -40,8 +40,6 @@ public class DeepSeekService {
         // Retrieve previous messages
         List<Map<String, Object>> previousMessages = conversationDao.getMessages(conversationId);
 
-        System.out.println(previousMessages);
-
         // Construct the "messages" array
         List<Map<String, String>> messages = new ArrayList<>();
         if (projectId != null) {

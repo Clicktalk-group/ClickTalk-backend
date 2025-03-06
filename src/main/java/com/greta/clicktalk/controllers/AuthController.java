@@ -1,5 +1,12 @@
 package com.greta.clicktalk.controllers;
 
+import com.greta.clicktalk.DAOs.SettingDao;
+import com.greta.clicktalk.DAOs.UserDao;
+import com.greta.clicktalk.DTOs.UpdatePasswordRequestDTO;
+import com.greta.clicktalk.entities.User;
+import com.greta.clicktalk.services.JwtUtil;
+import com.greta.clicktalk.services.PasswordUpdateService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,19 +33,22 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
+    private final SettingDao settingDao;
     private final PasswordUpdateService passwordUpdateService;
     private final UserDao userDao;
     private final PasswordEncoder encoder;
     private final JwtUtil jwtUtils;
 
-    public AuthController(AuthenticationManager authenticationManager, UserDao userDao,
-            PasswordUpdateService passwordUpdateService, PasswordEncoder encoder, JwtUtil jwtUtils) {
+    public AuthController(AuthenticationManager authenticationManager, UserDao userDao, SettingDao settingDao, PasswordUpdateService passwordUpdateService, PasswordEncoder encoder, JwtUtil jwtUtils) {
         this.authenticationManager = authenticationManager;
         this.userDao = userDao;
+        this.settingDao = settingDao;
         this.passwordUpdateService = passwordUpdateService;
         this.encoder = encoder;
         this.jwtUtils = jwtUtils;
@@ -50,22 +60,27 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content(examples = @ExampleObject(name = "Invalid request", value = "Error: Email is already in use!")))
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = @ExampleObject(name = "Example user", value = "{\"email\":\"user@example.com\",\"password\":\"password123\"}")))
-    public ResponseEntity<String> registerUser(@Valid @RequestBody User user) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody User user) {
         boolean alreadyExists = userDao.existsByEmail(user.getEmail());
         if (alreadyExists) {
             return ResponseEntity.badRequest().body("Error: Email is already in use!");
         }
-
         User newUser = new User(
-                user.getEmail(),
-                encoder.encode(user.getPassword()),
-                "USER");
+            user.getEmail(),
+            encoder.encode(user.getPassword()),
+            "USER"
+        );
+        newUser = userDao.save(newUser);
 
-        boolean isUserExists = userDao.save(newUser);
-
-        if (isUserExists) {
+        if(newUser != null) {
+            // add the initial setting
+            settingDao.addSetting("dark",newUser.getId());
             String jwtToken = jwtUtils.generateToken(newUser.getEmail());
-            return ResponseEntity.ok("User registered successfully! your Token: " + jwtToken);
+            return ResponseEntity.ok(Map.of(
+                    "access_token", jwtToken,
+                    "token_type", "Bearer",
+                    "expires_in", 3600
+            ));
         }
         return ResponseEntity.badRequest().body("Error: user registration failed!");
     }
@@ -76,17 +91,21 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content(examples = @ExampleObject(name = "Unauthorized", value = "Invalid email or password")))
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = @ExampleObject(name = "Example user", value = "{\"email\":\"user@example.com\",\"password\":\"password123\"}")))
-    public String authenticateUser(@RequestBody User user) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            user.getEmail(),
-                            user.getPassword()));
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            return jwtUtils.generateToken(userDetails.getUsername());
-        } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Invalid username or password!");
-        }
+    public ResponseEntity<?> authenticateUser( @RequestBody User user) {
+       Authentication authentication = authenticationManager.authenticate(
+               new UsernamePasswordAuthenticationToken(
+                       user.getEmail(),
+                       user.getPassword()
+               )
+       );
+       UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+       String token = jwtUtils.generateToken(userDetails.getUsername());
+
+        return ResponseEntity.ok(Map.of(
+                "access_token", token,
+                "token_type", "Bearer",
+                "expires_in", 3600
+        ));
     }
 
     @PutMapping("update-password")
@@ -95,9 +114,8 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content(examples = @ExampleObject(name = "Invalid request", value = "Error: your password is not correct!")))
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = @ExampleObject(name = "Example password update", value = "{\"currentPassword\":\"oldPassword123\",\"newPassword\":\"newPassword123\"}")))
-    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordRequestDTO updatePasswordRequestDTO,
-            Authentication authentication) {
-        return passwordUpdateService.updatePassword(updatePasswordRequestDTO, authentication);
+    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordRequestDTO updatePasswordRequestDTO,Authentication authentication) {
+    return passwordUpdateService.updatePassword(updatePasswordRequestDTO, authentication);
     }
 
     @DeleteMapping("delete")

@@ -5,8 +5,13 @@ import com.greta.clicktalk.excetions.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
 
 @Repository
 public class UserDao {
@@ -32,10 +37,22 @@ public class UserDao {
                 .orElseThrow(() -> new UsernameNotFoundException("user not found"));
     }
 
-    public boolean save(User user) {
+    public User save(User user) {
         String sql = "INSERT INTO users (email, password, role) VALUES (?, ?, ?)";
-        int rowsAffected = jdbcTemplate.update(sql, user.getEmail(), user.getPassword(), user.getRole());
-        return rowsAffected > 0;
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(con -> {
+            var ps = con.prepareStatement(sql, new String[]{"id"});
+            ps.setString(1, user.getEmail());
+            ps.setString(2, user.getPassword());
+            ps.setString(3, user.getRole());
+            return ps;
+        }, keyHolder);
+
+        if (keyHolder.getKey() != null) {
+            user.setId(keyHolder.getKey().longValue());
+        }
+
+        return user;
     }
 
     public ResponseEntity<String> updatePassword(String email, String password) {
@@ -56,6 +73,10 @@ public class UserDao {
         }
         String sql = "DELETE FROM users WHERE id = ?";
         int rowsAffected = jdbcTemplate.update(sql, id);
+
+        // reset the auto_increment for users table
+        jdbcTemplate.update("ALTER TABLE users AUTO_INCREMENT = 0;");
+
         return rowsAffected > 0? ResponseEntity.noContent().build() : ResponseEntity.internalServerError().body("Error while deleting user");
     }
 
@@ -63,6 +84,15 @@ public class UserDao {
         String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
         Integer usersNumber = jdbcTemplate.queryForObject(sql, Integer.class, email);
         return usersNumber != null && usersNumber > 0;
+    }
+
+    public long getUserIdFromAuth(Authentication auth) {
+        if(auth == null){
+            throw new IllegalStateException("the user is not logged in");
+        }
+        String email = auth.getName();
+        User user = findByEmail(email);
+        return user.getId();
     }
 
     private boolean existsById(long id) {

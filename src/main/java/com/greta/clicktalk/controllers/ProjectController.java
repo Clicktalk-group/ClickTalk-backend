@@ -42,7 +42,7 @@ public class ProjectController {
     })
 
     public ResponseEntity<List<ProjectResponseDTO>> getAllProjects(Authentication auth) {
-        long userId = getUserIdFromAuthentication(auth);
+        long userId = userDao.getUserIdFromAuth(auth);
         return projectDao.getAllProjectsByUserId(userId);
     }
 
@@ -54,7 +54,7 @@ public class ProjectController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = @ExampleObject(name = "Example project", value = "{\"title\":\"new project\",\"context\":\"You are a helpful assistant\"}")))
 
     public ResponseEntity<Project> addProject(@RequestBody Project project, Authentication auth) {
-        long userId = getUserIdFromAuthentication(auth);
+        long userId = userDao.getUserIdFromAuth(auth);
         project.setUserId(userId);
         return projectDao.addNewProject(project);
     }
@@ -68,7 +68,7 @@ public class ProjectController {
     @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(examples = @ExampleObject(name = "Example project", value = "{\"id\":\"1\", \"title\":\"new project\",\"context\":\"You are a helpful assistant\"}")))
 
     public ResponseEntity<?> updateProject(@RequestBody Project project, Authentication auth) {
-        long userId = getUserIdFromAuthentication(auth);
+        long userId = userDao.getUserIdFromAuth(auth);
         project.setUserId(userId);
         return projectDao.updateProject(project);
     }
@@ -81,13 +81,7 @@ public class ProjectController {
     })
 
     public ResponseEntity<String> deleteProject(@PathVariable long id, Authentication auth) {
-        long userId = getUserIdFromAuthentication(auth);
+        long userId = userDao.getUserIdFromAuth(auth);
         return projectDao.deleteProject(id, userId);
-    }
-
-    private long getUserIdFromAuthentication(Authentication auth) {
-        String email = auth.getName();
-        User currentUser = userDao.findByEmail(email);
-        return currentUser.getId();
     }
 }

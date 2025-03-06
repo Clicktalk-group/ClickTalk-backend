@@ -36,10 +36,9 @@ public class ConversationController {
             @ApiResponse(responseCode = "200", description = "Conversations retrieved successfully", content = @Content(examples = @ExampleObject(name = "Example response", value = "[{\"id\":1,\"userId\":1,\"title\":\"Conversation 1\",\"createdAt\":\"2025-03-04T10:00:00\"}]"))),
             @ApiResponse(responseCode = "204", description = "No conversations found", content = @Content(examples = @ExampleObject(name = "No conversations found", value = "[]")))
     })
-    public ResponseEntity<List<Conversation>> getAllConversations(Authentication authentication) {
-        String username = authentication.getName();
-        User currentUser = userDao.findByEmail(username);
-        return conversationDao.getAllConversationsByUserId(currentUser.getId());
+    public ResponseEntity<List<Conversation>> getAllConversations(Authentication auth) {
+        long userId = userDao.getUserIdFromAuth(auth);
+        return conversationDao.getAllConversationsByUserId(userId);
     }
 
     @GetMapping("{id}")
@@ -47,23 +46,18 @@ public class ConversationController {
             @ApiResponse(responseCode = "200", description = "Conversation retrieved successfully", content = @Content(examples = @ExampleObject(name = "Example response", value = "{\"id\":1,\"userId\":1,\"title\":\"Conversation 1\",\"createdAt\":\"2025-03-04T10:00:00\"}"))),
             @ApiResponse(responseCode = "404", description = "Conversation not found", content = @Content(examples = @ExampleObject(name = "Conversation not found", value = "{\"error\":\"Conversation with id 1 not found\"}")))
     })
-    public ResponseEntity<?> getConversationById(Authentication authentication, @PathVariable long id) {
-        String username = authentication.getName();
-        User currentUser = userDao.findByEmail(username);
-        return conversationDao.getConversationById(id, currentUser.getId());
-    }
-
-    @GetMapping("project/{project-id}")
+ public ResponseEntity<?> getConversationById(Authentication auth, @PathVariable long id) {
+       long userId = userDao.getUserIdFromAuth(auth);
+       return  conversationDao.getConversationById(id,userId);
     @Operation(summary = "Get conversations by project ID", description = "Retrieve all conversations for a specific project for the authenticated user.", responses = {
             @ApiResponse(responseCode = "200", description = "Conversations retrieved successfully", content = @Content(examples = @ExampleObject(name = "Example response", value = "[{\"id\":1,\"userId\":1,\"title\":\"Conversation 1\",\"createdAt\":\"2025-03-04T10:00:00\"}]"))),
             @ApiResponse(responseCode = "204", description = "No conversations found", content = @Content(examples = @ExampleObject(name = "No conversations found", value = "[]")))
     })
-    public ResponseEntity<?> getConversationByProjectId(Authentication authentication,
-            @PathVariable("project-id") long projectId) {
-        String username = authentication.getName();
-        User currentUser = userDao.findByEmail(username);
-        long userId = currentUser.getId();
-        List<Conversation> conversations = conversationDao.getConversationsByProjectId(projectId, userId);
+      public ResponseEntity<?> getConversationByProjectId(Authentication auth, @PathVariable("project-id") long projectId) {
+        long userId = userDao.getUserIdFromAuth(auth);
+
+        List<Conversation> conversations =conversationDao.getConversationsByProjectId(projectId,userId);
+
         return ResponseEntity.ok(conversations);
     }
 
@@ -73,9 +67,9 @@ public class ConversationController {
             @ApiResponse(responseCode = "404", description = "Conversation not found", content = @Content(examples = @ExampleObject(name = "Conversation not found", value = "{\"error\":\"Conversation with id 1 not found\"}"))),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(examples = @ExampleObject(name = "Internal server error", value = "{\"error\":\"Error while deleting conversation\"}")))
     })
-    public ResponseEntity<String> deleteConversation(Authentication authentication, @PathVariable long id) {
-        String email = authentication.getName();
-        User currentUser = userDao.findByEmail(email);
-        return conversationDao.deleteConversation(id, currentUser.getId());
+   public ResponseEntity<String> deleteConversation(Authentication auth,@PathVariable long id) {
+        long userId = userDao.getUserIdFromAuth(auth);
+
+        return  conversationDao.deleteConversation(id,userId);
     }
 }

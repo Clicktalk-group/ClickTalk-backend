@@ -32,7 +32,9 @@ public class MessagesService {
     public ResponseEntity<?> addMessage(SendMessageRequestDTO sendMessageRequestDTO, Authentication auth) {
 
         // get the current user id
-        long userId = getUserIdFromAuth(auth);
+        long userId = userDao.getUserIdFromAuth(auth);
+        Long projectId =  sendMessageRequestDTO.getProjectId();
+        Long conversationId =  sendMessageRequestDTO.getConversationId();
 
         // get the project id and conversation id from the request
         Long projectId = sendMessageRequestDTO.getProjectId();
@@ -66,16 +68,7 @@ public class MessagesService {
     }
 
     public ResponseEntity<?> getConversationMessages(Long conversationId, Authentication auth) {
-        long userId = getUserIdFromAuth(auth);
-        return messageDao.getConversationMessages(conversationId, userId);
-    }
-
-    private long getUserIdFromAuth(Authentication auth) {
-        if (auth == null) {
-            throw new IllegalStateException("the user is not logged in");
-        }
-        String email = auth.getName();
-        User currentUser = userDao.findByEmail(email);
-        return currentUser.getId();
+         long userId = userDao.getUserIdFromAuth(auth);
+        return  messageDao.getConversationMessages(conversationId,userId);
     }
 }
