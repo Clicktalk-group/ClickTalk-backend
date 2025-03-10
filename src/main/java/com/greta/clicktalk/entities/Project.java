@@ -1,9 +1,5 @@
 package com.greta.clicktalk.entities;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.Table;
-
 public class Project {
     private long id;
     private long userId;
@@ -19,7 +15,7 @@ public class Project {
         this.context = context;
     }
 
-    public Project(long id,long userId, String title, String context) {
+    public Project(long id, long userId, String title, String context) {
         this.id = id;
         this.userId = userId;
         this.title = title;

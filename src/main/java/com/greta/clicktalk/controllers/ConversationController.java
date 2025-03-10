@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.greta.clicktalk.DAOs.ConversationDao;
 import com.greta.clicktalk.DAOs.UserDao;
 import com.greta.clicktalk.entities.Conversation;
-import com.greta.clicktalk.entities.User;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -45,7 +44,7 @@ public class ConversationController {
             @ApiResponse(responseCode = "200", description = "Conversation retrieved successfully", content = @Content(examples = @ExampleObject(name = "Example response", value = "{\"id\":1,\"userId\":1,\"title\":\"Conversation 1\",\"createdAt\":\"2025-03-04T10:00:00\"}"))),
             @ApiResponse(responseCode = "404", description = "Conversation not found", content = @Content(examples = @ExampleObject(name = "Conversation not found", value = "{\"error\":\"Conversation with id 1 not found\"}")))
     })
- public ResponseEntity<?> getConversationById(Authentication auth, @PathVariable long id) {
+    public ResponseEntity<?> getConversationById(Authentication auth, @PathVariable long id) {
         long userId = userDao.getUserIdFromAuth(auth);
         return conversationDao.getConversationById(id, userId);
     };
@@ -55,10 +54,11 @@ public class ConversationController {
             @ApiResponse(responseCode = "200", description = "Conversations retrieved successfully", content = @Content(examples = @ExampleObject(name = "Example response", value = "[{\"id\":1,\"userId\":1,\"title\":\"Conversation 1\",\"createdAt\":\"2025-03-04T10:00:00\"}]"))),
             @ApiResponse(responseCode = "204", description = "No conversations found", content = @Content(examples = @ExampleObject(name = "No conversations found", value = "[]")))
     })
-      public ResponseEntity<?> getConversationByProjectId(Authentication auth, @PathVariable("project-id") long projectId) {
+    public ResponseEntity<?> getConversationByProjectId(Authentication auth,
+            @PathVariable("project-id") long projectId) {
         long userId = userDao.getUserIdFromAuth(auth);
 
-        List<Conversation> conversations =conversationDao.getConversationsByProjectId(projectId,userId);
+        List<Conversation> conversations = conversationDao.getConversationsByProjectId(projectId, userId);
 
         return ResponseEntity.ok(conversations);
     }
@@ -69,9 +69,9 @@ public class ConversationController {
             @ApiResponse(responseCode = "404", description = "Conversation not found", content = @Content(examples = @ExampleObject(name = "Conversation not found", value = "{\"error\":\"Conversation with id 1 not found\"}"))),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(examples = @ExampleObject(name = "Internal server error", value = "{\"error\":\"Error while deleting conversation\"}")))
     })
-   public ResponseEntity<String> deleteConversation(Authentication auth,@PathVariable long id) {
+    public ResponseEntity<String> deleteConversation(Authentication auth, @PathVariable long id) {
         long userId = userDao.getUserIdFromAuth(auth);
 
-        return  conversationDao.deleteConversation(id,userId);
+        return conversationDao.deleteConversation(id, userId);
     }
 }

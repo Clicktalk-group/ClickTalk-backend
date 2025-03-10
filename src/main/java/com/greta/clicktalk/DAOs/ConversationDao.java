@@ -1,8 +1,9 @@
 package com.greta.clicktalk.DAOs;
 
-import com.greta.clicktalk.entities.Conversation;
-import com.greta.clicktalk.excetions.ResourceNotFoundException;
-import org.springframework.http.HttpStatus;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,10 +11,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import com.greta.clicktalk.entities.Conversation;
+import com.greta.clicktalk.excetions.ResourceNotFoundException;
 
 @Repository
 public class ConversationDao {
@@ -23,12 +22,11 @@ public class ConversationDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private final RowMapper<Conversation> conversationRowMapper = (rs,_)-> new Conversation(
-        rs.getLong("id"),
-        rs.getLong("user_id"),
-        rs.getString("title"),
-        rs.getString("created_at")
-    );
+    private final RowMapper<Conversation> conversationRowMapper = (rs, _) -> new Conversation(
+            rs.getLong("id"),
+            rs.getLong("user_id"),
+            rs.getString("title"),
+            rs.getString("created_at"));
 
     public ResponseEntity<List<Conversation>> getAllConversationsByUserId(long userId) {
         String sql = "SELECT * FROM conversations AS c WHERE user_id=? AND c.id NOT IN (SELECT conv_id FROM project_conversation)";
@@ -37,20 +35,21 @@ public class ConversationDao {
         return ResponseEntity.ok(conversations);
     }
 
-    public ResponseEntity<?> getConversationById(long conversationId,long userId) {
-        if(!existsById(conversationId)) {
+    public ResponseEntity<?> getConversationById(long conversationId, long userId) {
+        if (!existsById(conversationId)) {
             throw new ResourceNotFoundException("Conversation with id " + conversationId + " not found");
         }
         String sql = "SELECT * FROM conversations WHERE id=? AND user_id=?  ";
 
-        Conversation conversation = jdbcTemplate.queryForObject(sql, conversationRowMapper,conversationId, userId);
-        return conversation == null ? ResponseEntity.internalServerError().body("something went wrong") : ResponseEntity.ok(conversation);
+        Conversation conversation = jdbcTemplate.queryForObject(sql, conversationRowMapper, conversationId, userId);
+        return conversation == null ? ResponseEntity.internalServerError().body("something went wrong")
+                : ResponseEntity.ok(conversation);
     }
 
-    public List<Conversation> getConversationsByProjectId(long projectId,long userId) {
+    public List<Conversation> getConversationsByProjectId(long projectId, long userId) {
         String sql = "SELECT * FROM conversations AS c WHERE c.user_id = ? AND c.id IN (SELECT conv_id FROM project_conversation WHERE project_id=?)";
 
-        return jdbcTemplate.query(sql, conversationRowMapper,userId,projectId) ;
+        return jdbcTemplate.query(sql, conversationRowMapper, userId, projectId);
     }
 
     public List<Map<String, Object>> getMessages(Long conversationId) {
@@ -63,7 +62,7 @@ public class ConversationDao {
         String now = LocalDateTime.now().toString();
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
-            var ps = con.prepareStatement(sql, new String[]{"id"});
+            var ps = con.prepareStatement(sql, new String[] { "id" });
             ps.setLong(1, conversation.getUserId());
             ps.setString(2, conversation.getTitle());
             ps.setString(3, now);
@@ -79,19 +78,19 @@ public class ConversationDao {
         return conversation;
     }
 
-    public ResponseEntity<String> deleteConversation(long conversationId,long userId) {
+    public ResponseEntity<String> deleteConversation(long conversationId, long userId) {
         if (!existsById(conversationId)) {
             throw new ResourceNotFoundException("Conversation with id " + conversationId + " not found");
         }
-    String sql = "DELETE FROM conversations WHERE id=? AND user_id = ?";
-    int rowAffected = jdbcTemplate.update(sql, conversationId, userId);
+        String sql = "DELETE FROM conversations WHERE id=? AND user_id = ?";
+        int rowAffected = jdbcTemplate.update(sql, conversationId, userId);
 
-    // reset the auto_increment for conversations table
-    jdbcTemplate.update("ALTER TABLE conversations AUTO_INCREMENT = 0;");
-    return rowAffected > 0 ? ResponseEntity.noContent().build() : ResponseEntity.internalServerError().body("Error: something went wrong while deleting a conversation");
+        // reset the auto_increment for conversations table
+        jdbcTemplate.update("ALTER TABLE conversations AUTO_INCREMENT = 0;");
+        return rowAffected > 0 ? ResponseEntity.noContent().build()
+                : ResponseEntity.internalServerError()
+                        .body("Error: something went wrong while deleting a conversation");
     }
-
-
 
     public boolean existsById(long conversationId) {
         String sql = "SELECT COUNT(*) FROM conversations WHERE id=?";

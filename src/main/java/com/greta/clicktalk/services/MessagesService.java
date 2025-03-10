@@ -10,7 +10,6 @@ import com.greta.clicktalk.DAOs.ProjectConversationDao;
 import com.greta.clicktalk.DAOs.UserDao;
 import com.greta.clicktalk.DTOs.SendMessageRequestDTO;
 import com.greta.clicktalk.entities.Conversation;
-import com.greta.clicktalk.entities.User;
 
 @Service
 public class MessagesService {
@@ -38,7 +37,6 @@ public class MessagesService {
         Long projectId = sendMessageRequestDTO.getProjectId();
         Long conversationId = sendMessageRequestDTO.getConversationId();
 
-        System.out.println(conversationId);
         // if the conversation id is not provided, create a new conversation
         if (conversationId == null) {
             // generate the title for the first message
@@ -67,7 +65,7 @@ public class MessagesService {
     }
 
     public ResponseEntity<?> getConversationMessages(Long conversationId, Authentication auth) {
-         long userId = userDao.getUserIdFromAuth(auth);
-        return  messageDao.getConversationMessages(conversationId,userId);
+        long userId = userDao.getUserIdFromAuth(auth);
+        return messageDao.getConversationMessages(conversationId, userId);
     }
 }

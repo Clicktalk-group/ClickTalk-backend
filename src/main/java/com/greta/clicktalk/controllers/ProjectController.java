@@ -17,7 +17,6 @@ import com.greta.clicktalk.DAOs.ProjectDao;
 import com.greta.clicktalk.DAOs.UserDao;
 import com.greta.clicktalk.DTOs.ProjectResponseDTO;
 import com.greta.clicktalk.entities.Project;
-import com.greta.clicktalk.entities.User;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

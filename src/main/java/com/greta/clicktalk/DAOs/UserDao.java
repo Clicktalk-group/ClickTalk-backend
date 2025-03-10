@@ -1,7 +1,5 @@
 package com.greta.clicktalk.DAOs;
 
-import com.greta.clicktalk.entities.User;
-import com.greta.clicktalk.excetions.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,7 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import com.greta.clicktalk.entities.User;
+import com.greta.clicktalk.excetions.ResourceNotFoundException;
 
 @Repository
 public class UserDao {
@@ -26,8 +25,7 @@ public class UserDao {
             rs.getInt("id"),
             rs.getString("email"),
             rs.getString("password"),
-            rs.getString("role")
-    );
+            rs.getString("role"));
 
     public User findByEmail(String email) {
         String sql = "SELECT * FROM users WHERE email = ?";
@@ -41,7 +39,7 @@ public class UserDao {
         String sql = "INSERT INTO users (email, password, role) VALUES (?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
-            var ps = con.prepareStatement(sql, new String[]{"id"});
+            var ps = con.prepareStatement(sql, new String[] { "id" });
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getRole());
@@ -57,19 +55,20 @@ public class UserDao {
 
     public ResponseEntity<String> updatePassword(String email, String password) {
 
-        if(!existsByEmail(email)) {
+        if (!existsByEmail(email)) {
             throw new ResourceNotFoundException("user not found");
         }
 
         String sql = "UPDATE users SET password = ? WHERE email = ?";
         int rowsAffected = jdbcTemplate.update(sql, password, email);
 
-        return rowsAffected > 0 ? ResponseEntity.ok("Password updated successfully") : ResponseEntity.internalServerError().body("Password update failed");
+        return rowsAffected > 0 ? ResponseEntity.ok("Password updated successfully")
+                : ResponseEntity.internalServerError().body("Password update failed");
     }
 
-    public ResponseEntity<String> deleteUserById(long id ) {
-        if(!existsById(id)) {
-             throw new ResourceNotFoundException("user not found");
+    public ResponseEntity<String> deleteUserById(long id) {
+        if (!existsById(id)) {
+            throw new ResourceNotFoundException("user not found");
         }
         String sql = "DELETE FROM users WHERE id = ?";
         int rowsAffected = jdbcTemplate.update(sql, id);
@@ -77,7 +76,8 @@ public class UserDao {
         // reset the auto_increment for users table
         jdbcTemplate.update("ALTER TABLE users AUTO_INCREMENT = 0;");
 
-        return rowsAffected > 0? ResponseEntity.noContent().build() : ResponseEntity.internalServerError().body("Error while deleting user");
+        return rowsAffected > 0 ? ResponseEntity.noContent().build()
+                : ResponseEntity.internalServerError().body("Error while deleting user");
     }
 
     public boolean existsByEmail(String email) {
@@ -87,7 +87,7 @@ public class UserDao {
     }
 
     public long getUserIdFromAuth(Authentication auth) {
-        if(auth == null){
+        if (auth == null) {
             throw new IllegalStateException("the user is not logged in");
         }
         String email = auth.getName();
@@ -100,6 +100,5 @@ public class UserDao {
         Integer usersNumber = jdbcTemplate.queryForObject(sql, Integer.class, id);
         return usersNumber != null && usersNumber > 0;
     }
-
 
 }

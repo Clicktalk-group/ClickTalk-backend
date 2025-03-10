@@ -1,9 +1,8 @@
 package com.greta.clicktalk.DAOs;
 
-import com.greta.clicktalk.DTOs.ProjectResponseDTO;
-import com.greta.clicktalk.entities.Conversation;
-import com.greta.clicktalk.entities.Project;
-import com.greta.clicktalk.excetions.ResourceNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -11,9 +10,10 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import com.greta.clicktalk.DTOs.ProjectResponseDTO;
+import com.greta.clicktalk.entities.Conversation;
+import com.greta.clicktalk.entities.Project;
+import com.greta.clicktalk.excetions.ResourceNotFoundException;
 
 @Repository
 public class ProjectDao {
@@ -25,29 +25,26 @@ public class ProjectDao {
         this.conversationDao = conversationDao;
     }
 
-    private final RowMapper<Project> projectRowMapper = (rs, rowNum) ->
-            new Project(
-                    rs.getLong("id"),
-                    rs.getLong("user_id"),
-                    rs.getString("title"),
-                    rs.getString("context")
-            );
+    private final RowMapper<Project> projectRowMapper = (rs, rowNum) -> new Project(
+            rs.getLong("id"),
+            rs.getLong("user_id"),
+            rs.getString("title"),
+            rs.getString("context"));
 
     public ResponseEntity<List<ProjectResponseDTO>> getAllProjectsByUserId(long userId) {
         String sql = "SELECT * FROM projects where user_id = ?";
 
-        List<Project> projects  = jdbcTemplate.query(sql, projectRowMapper, userId);
+        List<Project> projects = jdbcTemplate.query(sql, projectRowMapper, userId);
 
         List<ProjectResponseDTO> responseDTOS = new ArrayList<>();
 
         for (Project project : projects) {
-            List<Conversation> conversations = conversationDao.getConversationsByProjectId(project.getId(),userId);
+            List<Conversation> conversations = conversationDao.getConversationsByProjectId(project.getId(), userId);
             responseDTOS.add(new ProjectResponseDTO(
                     project.getId(),
                     project.getTitle(),
                     project.getContext(),
-                    conversations
-            ));
+                    conversations));
         }
 
         return projects.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(responseDTOS);
@@ -55,7 +52,7 @@ public class ProjectDao {
 
     public String getProjectContext(Long projectId) {
         String sql = "SELECT context FROM projects where id = ?";
-         return jdbcTemplate.queryForObject(sql, String.class, projectId);
+        return jdbcTemplate.queryForObject(sql, String.class, projectId);
     }
 
     public ResponseEntity<Project> addNewProject(Project project) {
@@ -63,7 +60,7 @@ public class ProjectDao {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
-            var ps = con.prepareStatement(sql, new String[]{"id"});
+            var ps = con.prepareStatement(sql, new String[] { "id" });
             ps.setLong(1, project.getUserId());
             ps.setString(2, project.getTitle());
             ps.setString(3, project.getContext());
@@ -79,16 +76,18 @@ public class ProjectDao {
     }
 
     public ResponseEntity<?> updateProject(Project project) {
-        if(!existsById(project.getId())) {
+        if (!existsById(project.getId())) {
             throw new ResourceNotFoundException("Project with id " + project.getId() + " not found");
         }
         String sql = "UPDATE projects SET title = ?, context = ? WHERE id = ? and user_id = ?";
-        int rowAffected =  jdbcTemplate.update(sql, project.getTitle(), project.getContext(), project.getId(), project.getUserId());
-        return rowAffected > 0 ? ResponseEntity.ok(project) : ResponseEntity.internalServerError().body("Something went wrong while updating the project");
+        int rowAffected = jdbcTemplate.update(sql, project.getTitle(), project.getContext(), project.getId(),
+                project.getUserId());
+        return rowAffected > 0 ? ResponseEntity.ok(project)
+                : ResponseEntity.internalServerError().body("Something went wrong while updating the project");
     }
 
     public ResponseEntity<String> deleteProject(long id, long userId) {
-        if(!existsById(id)){
+        if (!existsById(id)) {
             throw new ResourceNotFoundException("Project with id " + id + " not found");
         }
 
@@ -98,13 +97,13 @@ public class ProjectDao {
         // reset the auto_increment for projects table
         jdbcTemplate.update("ALTER TABLE projects AUTO_INCREMENT = 0;");
 
-        return rowAffected > 0 ? ResponseEntity.noContent().build() :ResponseEntity.internalServerError().body("Delete project failed");
+        return rowAffected > 0 ? ResponseEntity.noContent().build()
+                : ResponseEntity.internalServerError().body("Delete project failed");
     }
 
     private boolean existsById(long id) {
         String sql = "SELECT COUNT(*) FROM projects WHERE id = ?";
-        Integer count =  jdbcTemplate.queryForObject(sql, Integer.class, id);
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
         return count != null && count > 0;
     }
 }
-

@@ -1,16 +1,14 @@
 package com.greta.clicktalk.controllers;
 
-
-import com.greta.clicktalk.DAOs.SettingDao;
-import com.greta.clicktalk.DAOs.UserDao;
-import com.greta.clicktalk.entities.Setting;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.greta.clicktalk.DAOs.SettingDao;
+import com.greta.clicktalk.DAOs.UserDao;
+import com.greta.clicktalk.entities.Setting;
 
 @RestController
 @RequestMapping("setting")
@@ -25,7 +23,7 @@ public class SettingController {
 
     @GetMapping
     public ResponseEntity<Setting> getUserSetting(Authentication auth) {
-    long userId = userDao.getUserIdFromAuth(auth);
-    return settingDao.getUserSetting(userId);
+        long userId = userDao.getUserIdFromAuth(auth);
+        return settingDao.getUserSetting(userId);
     }
 }
