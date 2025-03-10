@@ -1,4 +1,4 @@
-package com.greta.clicktalk.excetions;
+package com.greta.clicktalk.exceptions;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;

@@ -1,4 +1,4 @@
-package com.greta.clicktalk.serveces;
+package com.greta.clicktalk.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,8 +39,6 @@ public class DeepSeekService {
 
         // Retrieve previous messages
         List<Map<String, Object>> previousMessages = conversationDao.getMessages(conversationId);
-
-        System.out.println(previousMessages);
 
         // Construct the "messages" array
         List<Map<String, String>> messages = new ArrayList<>();
