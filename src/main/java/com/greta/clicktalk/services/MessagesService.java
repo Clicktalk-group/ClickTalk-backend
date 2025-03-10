@@ -38,6 +38,7 @@ public class MessagesService {
         Long projectId = sendMessageRequestDTO.getProjectId();
         Long conversationId = sendMessageRequestDTO.getConversationId();
 
+        System.out.println(conversationId);
         // if the conversation id is not provided, create a new conversation
         if (conversationId == null) {
             // generate the title for the first message

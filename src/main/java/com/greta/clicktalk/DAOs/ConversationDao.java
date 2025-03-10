@@ -2,6 +2,7 @@ package com.greta.clicktalk.DAOs;
 
 import com.greta.clicktalk.entities.Conversation;
 import com.greta.clicktalk.excetions.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class ConversationDao {
@@ -32,7 +34,7 @@ public class ConversationDao {
         String sql = "SELECT * FROM conversations AS c WHERE user_id=? AND c.id NOT IN (SELECT conv_id FROM project_conversation)";
 
         List<Conversation> conversations = jdbcTemplate.query(sql, conversationRowMapper, userId);
-        return conversations.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(conversations);
+        return ResponseEntity.ok(conversations);
     }
 
     public ResponseEntity<?> getConversationById(long conversationId,long userId) {

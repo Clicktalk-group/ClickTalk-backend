@@ -34,7 +34,6 @@ public class ConversationController {
     @GetMapping("all")
     @Operation(summary = "Get all conversations", description = "Retrieve all conversations for the authenticated user.", responses = {
             @ApiResponse(responseCode = "200", description = "Conversations retrieved successfully", content = @Content(examples = @ExampleObject(name = "Example response", value = "[{\"id\":1,\"userId\":1,\"title\":\"Conversation 1\",\"createdAt\":\"2025-03-04T10:00:00\"}]"))),
-            @ApiResponse(responseCode = "204", description = "No conversations found", content = @Content(examples = @ExampleObject(name = "No conversations found", value = "[]")))
     })
     public ResponseEntity<List<Conversation>> getAllConversations(Authentication auth) {
         long userId = userDao.getUserIdFromAuth(auth);
