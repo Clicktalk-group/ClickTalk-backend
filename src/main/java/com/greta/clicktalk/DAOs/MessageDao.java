@@ -1,7 +1,7 @@
 package com.greta.clicktalk.DAOs;
 
 import com.greta.clicktalk.entities.Message;
-import com.greta.clicktalk.excetions.ResourceNotFoundException;
+import com.greta.clicktalk.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -1,4 +1,4 @@
-package com.greta.clicktalk.excetions;
+package com.greta.clicktalk.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {

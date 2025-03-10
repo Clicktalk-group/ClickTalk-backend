@@ -1,7 +1,7 @@
 package com.greta.clicktalk.DAOs;
 
 import com.greta.clicktalk.entities.ProjectConversation;
-import com.greta.clicktalk.excetions.ConversationAlreadyAssignedException;
+import com.greta.clicktalk.exceptions.ConversationAlreadyAssignedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

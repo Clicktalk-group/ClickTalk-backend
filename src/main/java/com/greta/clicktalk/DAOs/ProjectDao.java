@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import com.greta.clicktalk.DTOs.ProjectResponseDTO;
 import com.greta.clicktalk.entities.Conversation;
 import com.greta.clicktalk.entities.Project;
-import com.greta.clicktalk.excetions.ResourceNotFoundException;
+import com.greta.clicktalk.exceptions.ResourceNotFoundException;
 
 @Repository
 public class ProjectDao {

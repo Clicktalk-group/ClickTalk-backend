@@ -1,4 +1,4 @@
-package com.greta.clicktalk.excetions;
+package com.greta.clicktalk.exceptions;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;

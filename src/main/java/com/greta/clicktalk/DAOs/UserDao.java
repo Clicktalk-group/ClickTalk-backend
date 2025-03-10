@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 
 import com.greta.clicktalk.entities.User;
-import com.greta.clicktalk.excetions.ResourceNotFoundException;
+import com.greta.clicktalk.exceptions.ResourceNotFoundException;
 
 @Repository
 public class UserDao {
