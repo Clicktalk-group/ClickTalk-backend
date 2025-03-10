@@ -9,29 +9,17 @@ import com.greta.clicktalk.services.PasswordUpdateService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.greta.clicktalk.DAOs.UserDao;
-import com.greta.clicktalk.DTOs.UpdatePasswordRequestDTO;
-import com.greta.clicktalk.entities.User;
-import com.greta.clicktalk.services.JwtUtil;
-import com.greta.clicktalk.services.PasswordUpdateService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.Valid;
 
 import java.util.Map;
 
@@ -75,11 +63,14 @@ public class AuthController {
         if(newUser != null) {
             // add the initial setting
             settingDao.addSetting("dark",newUser.getId());
+
             String jwtToken = jwtUtils.generateToken(newUser.getEmail());
+            String jwtRefreshToken = jwtUtils.generateRefreshToken(newUser.getEmail());
             return ResponseEntity.ok(Map.of(
                     "access_token", jwtToken,
+                    "refresh_token", jwtRefreshToken,
                     "token_type", "Bearer",
-                    "expires_in", 3600
+                    "expires_in", 3600000
             ));
         }
         return ResponseEntity.badRequest().body("Error: user registration failed!");
@@ -99,12 +90,15 @@ public class AuthController {
                )
        );
        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-       String token = jwtUtils.generateToken(userDetails.getUsername());
+       String email = userDetails.getUsername();
+       String token = jwtUtils.generateToken(email);
+       String refreshToken = jwtUtils.generateRefreshToken(email);
 
-        return ResponseEntity.ok(Map.of(
+       return ResponseEntity.ok(Map.of(
                 "access_token", token,
+                "refresh_token", refreshToken,
                 "token_type", "Bearer",
-                "expires_in", 3600
+                "expires_in", 3600000
         ));
     }
 
@@ -127,5 +121,20 @@ public class AuthController {
     public ResponseEntity<String> deleteUser(Authentication authentication) {
         User currentUser = userDao.findByEmail(authentication.getName());
         return userDao.deleteUserById(currentUser.getId());
+    }
+
+
+    @PostMapping("token/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody String refreshToken) {
+        if(refreshToken == null || refreshToken.isEmpty()){
+            return ResponseEntity.badRequest().body("refresh token is missing!");
+        }
+        String token = jwtUtils.tokenFromRefresh(refreshToken);
+        return ResponseEntity.ok(Map.of(
+                "access_token", token,
+                "refresh_token", refreshToken,
+                "token_type", "Bearer",
+                "expires_in", 3600000
+        ));
     }
 }

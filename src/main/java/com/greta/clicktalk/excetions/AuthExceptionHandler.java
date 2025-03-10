@@ -26,7 +26,7 @@ public class AuthExceptionHandler {
 
 @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<String> handleExpiredJwtException(ExpiredJwtException e) {
-    return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+    return new ResponseEntity<>("JWT token is expired", HttpStatus.UNAUTHORIZED);
 }
 
 @ExceptionHandler(UnsupportedJwtException.class)

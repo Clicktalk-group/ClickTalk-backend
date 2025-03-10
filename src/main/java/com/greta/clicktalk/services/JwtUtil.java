@@ -15,8 +15,10 @@ public class JwtUtil {
 
     @Value("${jwt.secret}")
     private String jwtSecret;
-    @Value("${jwt.expiration}")
-    private int jwtExpirationMs;
+    @Value("${jwt.access-token.expiration}")
+    private int accessTokenExpirationMs;
+    @Value("${jwt.refresh-token.expiration}")
+    private long refreshTokenExpirationMs;
     private SecretKey key;
 
     @PostConstruct
@@ -28,10 +30,27 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .setExpiration(new Date((new Date()).getTime() + accessTokenExpirationMs))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     };
+
+    public String generateRefreshToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + refreshTokenExpirationMs))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String tokenFromRefresh(String refreshToken) {
+        if(validateJwtToken(refreshToken)){
+            String email =  getEmailFromToken(refreshToken);
+            return generateRefreshToken(email);
+        }
+        return null;
+    }
 
 
     public String getEmailFromToken(String token) {

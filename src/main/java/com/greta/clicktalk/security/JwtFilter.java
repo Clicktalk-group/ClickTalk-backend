@@ -2,6 +2,7 @@ package com.greta.clicktalk.security;
 
 import com.greta.clicktalk.services.CustomUserDetailsService;
 import com.greta.clicktalk.services.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +45,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } catch (ExpiredJwtException e) {
+        // Log and return 401 UNAUTHORIZED
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\": \"JWT token is expired\"}");
+        return;
         } catch (Exception e) {
             System.out.println("Cannot set user authentication: " + e);
         }
