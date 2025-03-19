@@ -79,6 +79,9 @@ public class ProjectDao {
         if (!existsById(project.getId())) {
             throw new ResourceNotFoundException("Project with id " + project.getId() + " not found");
         }
+        if(project.getTitle() == null || project.getContext() == null) {
+            throw new IllegalArgumentException("illegal argument for update project with null title or context");
+        }
         String sql = "UPDATE projects SET title = ?, context = ? WHERE id = ? and user_id = ?";
         int rowAffected = jdbcTemplate.update(sql, project.getTitle(), project.getContext(), project.getId(),
                 project.getUserId());
