@@ -1,6 +1,7 @@
 package com.greta.clicktalk.excetions;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import org.springframework.http.HttpStatus;
@@ -19,24 +20,28 @@ public class AuthExceptionHandler {
     return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
 }
 
-@ExceptionHandler(MalformedJwtException.class)
-    public ResponseEntity<String> handleMalformedJwtException(MalformedJwtException e) {
-    return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-}
-
 @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<String> handleExpiredJwtException(ExpiredJwtException e) {
-    return new ResponseEntity<>("JWT token is expired", HttpStatus.UNAUTHORIZED);
+    String message = """
+                {
+                "message": "Token expired",
+                "type": "JWT Error"
+                "status":"401 Unauthorized"
+                }
+                """;
+    return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
 }
 
-@ExceptionHandler(UnsupportedJwtException.class)
-public ResponseEntity<String> handleExpiredJwtException(UnsupportedJwtException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-}
-
-@ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<String> handleAuthenticationException(AuthenticationException e) {
-    return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+@ExceptionHandler(JwtException.class)
+public ResponseEntity<String> handleJwtException(JwtException e) {
+    String message = """
+                {
+                "message": "Token is invalid or malformed.",
+                "type": "JWT Error"
+                "status":"401 Unauthorized"
+                }
+                """;
+    return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
 }
 
 @ExceptionHandler(BadCredentialsException.class)

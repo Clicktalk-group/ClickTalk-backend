@@ -3,6 +3,7 @@ package com.greta.clicktalk.security;
 import com.greta.clicktalk.services.CustomUserDetailsService;
 import com.greta.clicktalk.services.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,9 +50,27 @@ public class JwtFilter extends OncePerRequestFilter {
         // Log and return 401 UNAUTHORIZED
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
-        response.getWriter().write("{\"error\": \"JWT token is expired\"}");
+        response.getWriter().write("""
+                {
+                "message": "Token expired",
+                "type": "JWT Error"
+                "status":"401 Unauthorized"
+                }
+                """);
         return;
-        } catch (Exception e) {
+        } catch (JwtException e){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+                {
+                "message": "Token is invalid or malformed",
+                "type": "JWT Error"
+                "status":"401 Unauthorized"
+                }
+                """);
+            return;
+        }
+        catch (Exception e) {
             System.out.println("Cannot set user authentication: " + e);
         }
         chain.doFilter(request, response);
