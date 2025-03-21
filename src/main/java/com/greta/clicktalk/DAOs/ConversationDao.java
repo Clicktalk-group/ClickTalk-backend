@@ -89,7 +89,15 @@ public class ConversationDao {
         jdbcTemplate.update("ALTER TABLE conversations AUTO_INCREMENT = 0;");
         return rowAffected > 0 ? ResponseEntity.noContent().build()
                 : ResponseEntity.internalServerError()
-                        .body("Error: something went wrong while deleting a conversation");
+                .body("Error: something went wrong while deleting a conversation");
+    }
+
+    public void deleteAllProjectConversations(long userId, long projectId) {
+        String sql = "DELETE FROM conversations AS c WHERE c.user_id = ? AND c.id IN (SELECT conv_id FROM project_conversation WHERE project_id=?)";
+        jdbcTemplate.update(sql, userId, projectId);
+
+        // Reset teh auto_increment for conversations table
+        jdbcTemplate.update("ALTER TABLE conversations AUTO_INCREMENT = 0;");
     }
 
     public boolean existsById(long conversationId) {

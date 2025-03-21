@@ -94,6 +94,10 @@ public class ProjectDao {
             throw new ResourceNotFoundException("Project with id " + id + " not found");
         }
 
+        // first delete all project conversations
+        conversationDao.deleteAllProjectConversations(userId, id);
+
+        // delete the projects
         String sql = "DELETE FROM projects WHERE id = ? and user_id = ?";
         int rowAffected = jdbcTemplate.update(sql, id, userId);
 
