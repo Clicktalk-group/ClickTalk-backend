@@ -79,6 +79,9 @@ public class ProjectDao {
         if (!existsById(project.getId())) {
             throw new ResourceNotFoundException("Project with id " + project.getId() + " not found");
         }
+        if(project.getTitle() == null || project.getContext() == null) {
+            throw new IllegalArgumentException("illegal argument for update project with null title or context");
+        }
         String sql = "UPDATE projects SET title = ?, context = ? WHERE id = ? and user_id = ?";
         int rowAffected = jdbcTemplate.update(sql, project.getTitle(), project.getContext(), project.getId(),
                 project.getUserId());
@@ -91,6 +94,10 @@ public class ProjectDao {
             throw new ResourceNotFoundException("Project with id " + id + " not found");
         }
 
+        // first delete all project conversations
+        conversationDao.deleteAllProjectConversations(userId, id);
+
+        // delete the projects
         String sql = "DELETE FROM projects WHERE id = ? and user_id = ?";
         int rowAffected = jdbcTemplate.update(sql, id, userId);
 

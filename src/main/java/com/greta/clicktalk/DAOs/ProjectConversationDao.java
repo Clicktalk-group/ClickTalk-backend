@@ -21,9 +21,14 @@ public class ProjectConversationDao {
     );
 
     public void add(Long projectId, Long conversationId) {
-        if(exist(conversationId)) {
-            throw new ConversationAlreadyAssignedException("Conversation ID " + conversationId + " is already linked to a project.");
+        ProjectConversation projectConversation = exist(conversationId);
+        if(projectConversation != null) {
+            if(projectConversation.getProjectId() != projectId){
+                throw new ConversationAlreadyAssignedException("conversation with id " + conversationId + " already assigned to project " + projectId);
+            }
+            return;
         }
+
         try {
             String sql = "INSERT INTO project_conversation (project_id, conv_id) VALUES (?, ?) ";
             jdbcTemplate.update(sql, projectId, conversationId);
@@ -32,11 +37,9 @@ public class ProjectConversationDao {
         }
     }
 
-    private boolean exist(long conversation_id) {
-        String sql = "SELECT COUNT(*) FROM project_conversation WHERE conv_id = ?";
+    private ProjectConversation exist(long conversation_id) {
+        String sql = "SELECT * FROM project_conversation WHERE conv_id = ?";
 
-        Integer counter = jdbcTemplate.queryForObject(sql, Integer.class, conversation_id);
-
-        return counter != null && counter > 0;
+        return jdbcTemplate.query(sql, rowMapper, conversation_id).stream().findFirst().orElse(null);
     }
 }

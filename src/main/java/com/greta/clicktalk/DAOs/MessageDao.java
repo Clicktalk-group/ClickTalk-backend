@@ -6,8 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -52,13 +55,30 @@ public class MessageDao {
             throw new ResourceNotFoundException("Conversation with id "+conversationId+" does not exist");
         }
 
-        String sql = "INSERT INTO messages (conv_id,content,is_bot) VALUES (?,?,?);";
-           int rowAffected = jdbcTemplate.update(sql,conversationId,content,isBot);
-           if(rowAffected == 1){
-            String query = "SELECT * FROM messages ORDER BY created_at DESC LIMIT 1;";
-            Message message = jdbcTemplate.queryForObject(query, messageRowMapper);
+        String sql = "INSERT INTO messages (conv_id,content,is_bot,created_at) VALUES (?,?,?,?);";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        String now = LocalDateTime.now().toString();
+
+        jdbcTemplate.update(con -> {
+            var ps = con.prepareStatement(sql, new String[] { "id" });
+            ps.setLong(1, conversationId);
+            ps.setString(2, content);
+            ps.setBoolean(3, isBot);
+            ps.setString(4, now);
+            return ps;
+        }, keyHolder);
+
+        if(keyHolder.getKey() != null) {
+            Message message = new Message(
+                    keyHolder.getKey().longValue(),
+                    conversationId,
+                    content,
+                    isBot,
+                    now
+            );
             return ResponseEntity.ok(message);
-           }
-           return ResponseEntity.internalServerError().body("something went wrong while adding message");
+        }
+        return ResponseEntity.internalServerError().body("something went wrong while adding message");
+
     }
 }
