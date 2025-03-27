@@ -2,6 +2,7 @@ package com.greta.clicktalk.entities;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class User {
@@ -11,8 +12,12 @@ public class User {
     @Email(message = "you must write a valid email")
     private String email;
 
-    @NotBlank(message = "password must be 6 chat it lest")
-    @Size(min = 6, max = 20, message = "the password must be between 6 and 20 char")
+    @NotBlank(message = "Password cannot be empty")
+    @Size(min = 14, max = 25, message = "The password must be between 14 and 25 characters")
+    @Pattern(
+            regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,20}$",
+            message = "Password must contain at least one uppercase letter, one digit, and one special character"
+    )
     private String password;
     private String role;
 
